@@ -3,13 +3,14 @@ import { Gift, LogIn } from 'lucide-react'
 import { Badge } from '@/Components/ui/badge'
 import { Button } from '@/Components/ui/button'
 import { Card, CardContent, CardFooter, CardTitle } from '@/Components/ui/card'
+import { useI18n } from '@/i18n'
 import { ProfileSummary } from '@/types'
 
 export function ProfileCard({
   profile,
   home = false,
   list = false,
-  listLabel = 'Voir la liste',
+  listLabel,
 }: {
   profile: ProfileSummary
   home?: boolean
@@ -17,6 +18,8 @@ export function ProfileCard({
   listLabel?: string
 }) {
   const compact = home || list
+  const { t } = useI18n()
+  const resolvedListLabel = listLabel ?? t('profiles.viewList')
 
   return (
     <Card
@@ -70,9 +73,9 @@ export function ProfileCard({
             className="mt-3 min-w-[170px]"
           >
             {list ? (
-              <Link href={`/profiles/${profile.id}`}>{listLabel}</Link>
+              <Link href={`/profiles/${profile.id}`}>{resolvedListLabel}</Link>
             ) : (
-              'Me connecter'
+              t('profiles.login')
             )}
           </Button>
         ) : (
@@ -81,16 +84,18 @@ export function ProfileCard({
               {profile.displayAge ? (
                 <p>{profile.displayAge}</p>
               ) : (
-                <p>Liste personnelle</p>
+                <p>{t('profiles.personalList')}</p>
               )}
             </CardContent>
             <div className="mt-3 flex flex-wrap gap-2">
               <Badge variant={profile.isChild ? 'secondary' : 'default'}>
-                {profile.isChild ? 'Enfant' : 'Parent'}
+                {profile.isChild ? t('profiles.child') : t('profiles.parent')}
               </Badge>
               {profile.childrenCount ? (
                 <Badge variant="outline">
-                  {profile.childrenCount} enfant(s)
+                  {t('profiles.childrenCount', {
+                    count: profile.childrenCount,
+                  })}
                 </Badge>
               ) : null}
             </div>
@@ -104,13 +109,13 @@ export function ProfileCard({
             size="sm"
           >
             <LogIn data-icon="inline-start" />
-            Me connecter
+            {t('profiles.login')}
           </Button>
           {!compact ? (
             <Button asChild variant="outline" size="sm">
               <Link href={`/profiles/${profile.id}`}>
                 <Gift data-icon="inline-start" />
-                Voir
+                {t('profiles.view')}
               </Link>
             </Button>
           ) : null}

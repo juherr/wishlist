@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 use App\Http\Controllers\GiftController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SessionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/guest', [SessionController::class, 'createGuest'])->name('session.guest.create');
+Route::post('/locale/{locale}', LocaleController::class)
+    ->whereIn('locale', ['fr', 'en'])
+    ->name('locale.update');
 
 Route::post('/session/profile/{profile}', [SessionController::class, 'profile'])->name('session.profile');
 Route::post('/session/guest', [SessionController::class, 'guest'])->name('session.guest');

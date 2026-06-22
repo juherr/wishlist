@@ -3,6 +3,7 @@ import { Save, Trash2 } from 'lucide-react'
 import { FormEvent, ReactNode } from 'react'
 import { AppLayout } from '@/Layouts/AppLayout'
 import { Button } from '@/Components/ui/button'
+import { useI18n } from '@/i18n'
 import { PageProps, ProfileSummary } from '@/types'
 
 type ParentOption = {
@@ -31,6 +32,7 @@ const avatarChoices = Array.from({ length: 15 }, (_, index) => index + 1)
 
 export default function ProfileForm({ profile, parents }: ProfileFormProps) {
   const isEditing = Boolean(profile)
+  const { t } = useI18n()
   const {
     data,
     setData,
@@ -69,17 +71,32 @@ export default function ProfileForm({ profile, parents }: ProfileFormProps) {
   }
 
   return (
-    <AppLayout title={isEditing ? 'Modifier un profil' : 'Nouveau profil'} bare>
-      <Head title={isEditing ? 'Modifier un profil' : 'Nouveau profil'} />
+    <AppLayout
+      title={isEditing ? t('profileForm.editTitle') : t('profileForm.newTitle')}
+      bare
+    >
+      <Head
+        title={
+          isEditing ? t('profileForm.editTitle') : t('profileForm.newTitle')
+        }
+      />
       <section className="kdo-account-page">
         <div className="kdo-account-content">
           <div className="kdo-account-title">
-            <h1 className="kdo-title">Compte</h1>
-            <h2>{isEditing ? 'Modifier ce compte' : 'Ajouter un compte'}</h2>
+            <h1 className="kdo-title">{t('profileForm.account')}</h1>
+            <h2>
+              {isEditing
+                ? t('profileForm.editAccount')
+                : t('profileForm.addAccount')}
+            </h2>
           </div>
 
           <form onSubmit={submit} className="kdo-account-form">
-            <LegacyField label="Prénom" htmlFor="name" error={errors.name}>
+            <LegacyField
+              label={t('profileForm.firstName')}
+              htmlFor="name"
+              error={errors.name}
+            >
               <input
                 id="name"
                 className="kdo-input-plain"
@@ -91,8 +108,8 @@ export default function ProfileForm({ profile, parents }: ProfileFormProps) {
             </LegacyField>
 
             <LegacyField
-              label="Date de naissance"
-              helper="JJ/MM/AAAA"
+              label={t('profileForm.birthday')}
+              helper={t('profileForm.birthdayHelper')}
               htmlFor="birthday"
             >
               <input
@@ -107,11 +124,11 @@ export default function ProfileForm({ profile, parents }: ProfileFormProps) {
 
             <fieldset className="kdo-wrap-form kdo-wrap-form-group">
               <legend className="kdo-label-wrap">
-                <span>Tailles</span>
-                <small>Facultatif</small>
+                <span>{t('profileForm.sizes')}</span>
+                <small>{t('profileForm.optional')}</small>
               </legend>
               <div className="kdo-size-grid">
-                <MiniField label="Haut" htmlFor="size_top">
+                <MiniField label={t('profileForm.sizeTop')} htmlFor="size_top">
                   <input
                     id="size_top"
                     value={data.size_top}
@@ -120,7 +137,10 @@ export default function ProfileForm({ profile, parents }: ProfileFormProps) {
                     }
                   />
                 </MiniField>
-                <MiniField label="Bas" htmlFor="size_bottom">
+                <MiniField
+                  label={t('profileForm.sizeBottom')}
+                  htmlFor="size_bottom"
+                >
                   <input
                     id="size_bottom"
                     value={data.size_bottom}
@@ -129,7 +149,10 @@ export default function ProfileForm({ profile, parents }: ProfileFormProps) {
                     }
                   />
                 </MiniField>
-                <MiniField label="Pied" htmlFor="size_feet">
+                <MiniField
+                  label={t('profileForm.sizeFeet')}
+                  htmlFor="size_feet"
+                >
                   <input
                     id="size_feet"
                     value={data.size_feet}
@@ -143,7 +166,7 @@ export default function ProfileForm({ profile, parents }: ProfileFormProps) {
 
             <fieldset className="kdo-wrap-form kdo-wrap-form-group">
               <legend className="kdo-label-wrap">
-                <span>Illustration</span>
+                <span>{t('profileForm.illustration')}</span>
               </legend>
               <div className="kdo-avatar-grid">
                 {avatarChoices.map((avatar) => (
@@ -174,22 +197,25 @@ export default function ProfileForm({ profile, parents }: ProfileFormProps) {
 
             <fieldset className="kdo-child-field">
               <legend className="kdo-label-wrap">
-                <span>Compte enfant ?</span>
+                <span>{t('profileForm.childAccount')}</span>
               </legend>
-              <div className="kdo-child-switch" aria-label="Compte enfant">
+              <div
+                className="kdo-child-switch"
+                aria-label={t('profileForm.childAccount')}
+              >
                 <button
                   type="button"
                   className={data.is_child ? 'is-active' : ''}
                   onClick={() => setData('is_child', true)}
                 >
-                  Oui
+                  {t('profileForm.yes')}
                 </button>
                 <button
                   type="button"
                   className={!data.is_child ? 'is-active' : ''}
                   onClick={() => setData('is_child', false)}
                 >
-                  Non
+                  {t('profileForm.no')}
                 </button>
               </div>
             </fieldset>
@@ -197,7 +223,7 @@ export default function ProfileForm({ profile, parents }: ProfileFormProps) {
             {data.is_child ? (
               <fieldset className="kdo-wrap-form kdo-wrap-form-group">
                 <legend className="kdo-label-wrap">
-                  <span>Qui peut modifier cette liste ?</span>
+                  <span>{t('profileForm.managers')}</span>
                 </legend>
                 <div className="kdo-parent-grid">
                   {parents.map((parent) => (
@@ -230,7 +256,7 @@ export default function ProfileForm({ profile, parents }: ProfileFormProps) {
             <div className="kdo-form-actions">
               <Button type="submit" disabled={processing}>
                 <Save data-icon="inline-start" />
-                {isEditing ? 'Enregistrer' : 'Ajouter ce compte'}
+                {isEditing ? t('profileForm.save') : t('profileForm.create')}
               </Button>
               {profile ? (
                 <Button
@@ -240,7 +266,7 @@ export default function ProfileForm({ profile, parents }: ProfileFormProps) {
                   onClick={() => destroy(`/profiles/${profile.id}`)}
                 >
                   <Trash2 data-icon="inline-start" />
-                  Supprimer ce compte
+                  {t('profileForm.delete')}
                 </Button>
               ) : null}
             </div>

@@ -22,7 +22,9 @@ class GiftController extends Controller
         /** @var Gift $gift */
         $gift = $profile->gifts()->create($request->normalized());
 
-        return to_route('profiles.show', $profile)->with('success', "{$gift->title} ajouté.");
+        return to_route('profiles.show', $profile)->with('success', __('messages.gift.created', [
+            'title' => $gift->title,
+        ]));
     }
 
     public function update(GiftRequest $request, Profile $profile, Gift $gift): RedirectResponse
@@ -32,7 +34,9 @@ class GiftController extends Controller
 
         $gift->update($request->normalized());
 
-        return to_route('profiles.show', $profile)->with('success', "{$gift->title} modifié.");
+        return to_route('profiles.show', $profile)->with('success', __('messages.gift.updated', [
+            'title' => $gift->title,
+        ]));
     }
 
     public function destroy(Request $request, Profile $profile, Gift $gift): RedirectResponse
@@ -42,7 +46,7 @@ class GiftController extends Controller
 
         $gift->delete();
 
-        return to_route('profiles.show', $profile)->with('success', 'Cadeau supprimé.');
+        return to_route('profiles.show', $profile)->with('success', __('messages.gift.deleted'));
     }
 
     public function reserve(Request $request, Profile $profile, Gift $gift): RedirectResponse
@@ -50,11 +54,11 @@ class GiftController extends Controller
         abort_unless($gift->profile()->is($profile), 404);
 
         if ($gift->is_list) {
-            return to_route('profiles.show', $profile)->with('error', 'Une liste externe ne peut pas être réservée.');
+            return to_route('profiles.show', $profile)->with('error', __('messages.gift.list_not_reservable'));
         }
 
         if ($gift->is_reserved) {
-            return to_route('profiles.show', $profile)->with('error', 'Ce cadeau est déjà réservé.');
+            return to_route('profiles.show', $profile)->with('error', __('messages.gift.already_reserved'));
         }
 
         $activeProfile = $this->activeProfile($request);
@@ -68,7 +72,9 @@ class GiftController extends Controller
             'reserved_at' => now(),
         ])->save();
 
-        return to_route('profiles.show', $profile)->with('success', "{$gift->title} réservé.");
+        return to_route('profiles.show', $profile)->with('success', __('messages.gift.reserved', [
+            'title' => $gift->title,
+        ]));
     }
 
     public function cancelReservation(Request $request, Profile $profile, Gift $gift): RedirectResponse
@@ -90,6 +96,6 @@ class GiftController extends Controller
             'reserved_at' => null,
         ])->save();
 
-        return to_route('profiles.show', $profile)->with('success', 'Réservation annulée.');
+        return to_route('profiles.show', $profile)->with('success', __('messages.gift.reservation_cancelled'));
     }
 }

@@ -130,7 +130,7 @@ it('rejects concurrent reservations and keeps the original reservation', functio
     $this->withSession(['active_profile_id' => $secondReserver->id])
         ->post(route('profiles.gifts.reserve', [$owner, $gift]))
         ->assertRedirect(route('profiles.show', $owner))
-        ->assertSessionHas('error', 'Ce cadeau est déjà réservé.');
+        ->assertSessionHas('error', __('messages.gift.already_reserved'));
 
     expect($gift->refresh()->reserved_by_profile_id)->toBe($firstReserver->id);
 });
@@ -143,7 +143,7 @@ it('rejects reservation attempts on external lists', function (): void {
     $this->withSession(['active_profile_id' => $reserver->id])
         ->post(route('profiles.gifts.reserve', [$owner, $list]))
         ->assertRedirect(route('profiles.show', $owner))
-        ->assertSessionHas('error', 'Une liste externe ne peut pas être réservée.');
+        ->assertSessionHas('error', __('messages.gift.list_not_reservable'));
 
     expect($list->refresh()->is_reserved)->toBeFalse();
 });

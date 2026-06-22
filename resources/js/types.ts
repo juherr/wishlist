@@ -36,6 +36,8 @@ export type PageProps<T = Record<string, unknown>> = T & {
     success?: string
     error?: string
   }
+  locale: 'fr' | 'en'
+  supportedLocales: Array<'fr' | 'en'>
   session: {
     activeProfile: Pick<ProfileSummary, 'id' | 'name' | 'avatar'> | null
     guestName: string | null

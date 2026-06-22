@@ -10,6 +10,32 @@ it('shows the guest access page', function (): void {
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('Guest')
+            ->where('locale', 'fr')
+            ->where('supportedLocales.0', 'fr')
+            ->where('supportedLocales.1', 'en')
+        );
+});
+
+it('stores the selected locale and shares it with inertia', function (): void {
+    $this->from(route('home'))
+        ->post(route('locale.update', 'en'))
+        ->assertRedirect(route('home'))
+        ->assertSessionHas('locale', 'en');
+
+    $this->withSession(['locale' => 'en'])
+        ->get(route('home'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Home')
+            ->where('locale', 'en')
+        );
+});
+
+it('falls back to french when the session locale is unsupported', function (): void {
+    $this->withSession(['locale' => 'de'])
+        ->get(route('home'))
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Home')
+            ->where('locale', 'fr')
         );
 });
 
@@ -18,7 +44,17 @@ it('selects a profile and opens the profile list', function (): void {
 
     $this->post(route('session.profile', $profile))
         ->assertRedirect(route('profiles.show', $profile))
-        ->assertSessionHas('active_profile_id', $profile->id);
+        ->assertSessionHas('active_profile_id', $profile->id)
+        ->assertSessionHas('success', 'Profil Alice sélectionné.');
+});
+
+it('uses translated flash messages for english sessions', function (): void {
+    $profile = Profile::factory()->create(['name' => 'Alice']);
+
+    $this->withSession(['locale' => 'en'])
+        ->post(route('session.profile', $profile))
+        ->assertRedirect(route('profiles.show', $profile))
+        ->assertSessionHas('success', 'Alice profile selected.');
 });
 
 it('does not allow selecting a child profile session', function (): void {

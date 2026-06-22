@@ -90,9 +90,13 @@ class Profile extends Model
         $years = $this->birthday->age;
 
         if ($years <= 2) {
-            return $this->birthday->diffInMonths(now()).' mois';
+            return trans_choice('messages.age.months', (int) $this->birthday->diffInMonths(now()), [
+                'count' => (int) $this->birthday->diffInMonths(now()),
+            ]);
         }
 
-        return $years.' ans';
+        return trans_choice('messages.age.years', $years, [
+            'count' => $years,
+        ]);
     }
 }

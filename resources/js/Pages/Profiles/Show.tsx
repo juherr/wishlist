@@ -18,6 +18,7 @@ import {
 import { Input } from '@/Components/ui/input'
 import { Label } from '@/Components/ui/label'
 import { Textarea } from '@/Components/ui/textarea'
+import { useI18n } from '@/i18n'
 import { GiftSummary, PageProps, ProfileSummary } from '@/types'
 
 type Permissions = {
@@ -51,6 +52,7 @@ export default function ProfileShow({
   lists,
   permissions,
 }: ShowProps) {
+  const { t } = useI18n()
   const [editingGift, setEditingGift] = useState<GiftSummary | null>(null)
   const [giftDialogOpen, setGiftDialogOpen] = useState(false)
   const giftForm = useForm<GiftFormData>({
@@ -123,7 +125,7 @@ export default function ProfileShow({
               {permissions.canManage ? (
                 <Button asChild variant="outline">
                   <Link href={`/profiles/${profile.id}/edit`}>
-                    Modifier les infos
+                    {t('profiles.editInfo')}
                   </Link>
                 </Button>
               ) : null}
@@ -131,11 +133,11 @@ export default function ProfileShow({
           </div>
         </div>
 
-        {children.length && permissions.owner ? (
+        {children.length > 0 && permissions.owner ? (
           <ProfileLinks
-            title="Mes autres listes modifiables"
+            title={t('profiles.manageableChildren')}
             profiles={children}
-            listLabel="Accéder à la liste"
+            listLabel={t('profiles.accessList')}
           />
         ) : null}
 
@@ -143,7 +145,7 @@ export default function ProfileShow({
           {lists.length ? (
             <section className="flex flex-col gap-8">
               <h2 className="kdo-section-title text-[2.5rem]">
-                Mes listes externes
+                {t('profiles.externalLists')}
               </h2>
               <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {lists.map((gift) => (
@@ -160,7 +162,9 @@ export default function ProfileShow({
           ) : null}
 
           <section className="flex flex-col gap-8">
-            <h2 className="kdo-section-title text-[2.5rem]">Mes cadeaux</h2>
+            <h2 className="kdo-section-title text-[2.5rem]">
+              {t('profiles.gifts')}
+            </h2>
             {gifts.length ? (
               <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
                 {gifts.map((gift) => (
@@ -177,7 +181,7 @@ export default function ProfileShow({
               <Card>
                 <CardContent className="flex flex-col items-center gap-3 py-12 text-center text-muted-foreground">
                   <Gift />
-                  <p>Aucune idée pour le moment.</p>
+                  <p>{t('profiles.emptyGifts')}</p>
                 </CardContent>
               </Card>
             )}
@@ -196,7 +200,7 @@ export default function ProfileShow({
           <DialogTrigger asChild>
             <Button
               className="fixed bottom-8 right-8 z-30 size-16 rounded-full p-0 text-4xl shadow-[0_0_24px_rgba(32,40,89,0.35)]"
-              aria-label="Ajouter un cadeau"
+              aria-label={t('gift.addLabel')}
             >
               +
             </Button>
@@ -204,11 +208,10 @@ export default function ProfileShow({
           <DialogContent className="max-w-3xl border-0 bg-primary text-primary-foreground">
             <DialogHeader>
               <DialogTitle className="kdo-title text-[clamp(3rem,7vw,6rem)] text-primary-foreground">
-                {editingGift ? 'Modifier' : 'Ajouter'}
+                {editingGift ? t('gift.editHeading') : t('gift.addHeading')}
               </DialogTitle>
               <DialogDescription className="text-primary-foreground/80">
-                Un cadeau est réservable; une liste externe sert de lien vers
-                une autre liste.
+                {t('gift.help')}
               </DialogDescription>
             </DialogHeader>
             <GiftForm
@@ -225,7 +228,11 @@ export default function ProfileShow({
       {otherProfiles.length ? (
         <div className="kdo-primary-band -mx-4 mt-8 px-4 py-16 sm:-mx-8 sm:px-8">
           {otherProfiles.length ? (
-            <ProfileLinks title="Listes" profiles={otherProfiles} inverted />
+            <ProfileLinks
+              title={t('profiles.lists')}
+              profiles={otherProfiles}
+              inverted
+            />
           ) : null}
         </div>
       ) : null}
@@ -280,6 +287,8 @@ function GiftForm({
   onCancel: () => void
   inverted?: boolean
 }) {
+  const { t } = useI18n()
+
   return (
     <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2">
       <div className="flex flex-col gap-2 sm:col-span-2">
@@ -287,7 +296,7 @@ function GiftForm({
           htmlFor="title"
           className={inverted ? 'text-primary-foreground' : undefined}
         >
-          Titre
+          {t('gift.title')}
         </Label>
         <Input
           id="title"
@@ -304,7 +313,7 @@ function GiftForm({
           htmlFor="description"
           className={inverted ? 'text-primary-foreground' : undefined}
         >
-          Description
+          {t('gift.description')}
         </Label>
         <Textarea
           id="description"
@@ -317,7 +326,7 @@ function GiftForm({
           htmlFor="link"
           className={inverted ? 'text-primary-foreground' : undefined}
         >
-          Lien
+          {t('gift.link')}
         </Label>
         <Input
           id="link"
@@ -335,16 +344,16 @@ function GiftForm({
             form.setData('is_list', checked === true)
           }
         />
-        <span className="text-sm font-medium">Liste externe</span>
+        <span className="text-sm font-medium">{t('gift.externalList')}</span>
       </label>
       <div className="flex flex-wrap gap-2 sm:col-span-2">
         <Button type="submit" disabled={form.processing}>
           <Save data-icon="inline-start" />
-          {editingGift ? 'Mettre à jour' : 'Ajouter'}
+          {editingGift ? t('gift.update') : t('gift.add')}
         </Button>
         {editingGift ? (
           <Button type="button" variant="outline" onClick={onCancel}>
-            Annuler
+            {t('gift.cancel')}
           </Button>
         ) : null}
       </div>
@@ -363,6 +372,8 @@ function GiftCard({
   permissions: Permissions
   onEdit: () => void
 }) {
+  const { t } = useI18n()
+
   return (
     <Card
       data-testid={`gift-card-${gift.title}`}
@@ -408,7 +419,7 @@ function GiftCard({
               }
             >
               <a href={gift.link} target="_blank" rel="noreferrer">
-                Voir
+                {t('gift.view')}
               </a>
             </Button>
           ) : null}
@@ -422,7 +433,7 @@ function GiftCard({
                   : 'text-sm text-primary-foreground/75'
               }
             >
-              Réservé
+              {t('gift.reserved')}
             </span>
           ) : null}
           {!permissions.canManage && !gift.isList && !gift.isReserved ? (
@@ -436,7 +447,7 @@ function GiftCard({
                 )
               }
             >
-              Réserver
+              {t('gift.reserve')}
             </Button>
           ) : null}
           {(gift.reservedByCurrentSession || permissions.canManage) &&
@@ -450,7 +461,7 @@ function GiftCard({
                 )
               }
             >
-              Annuler
+              {t('gift.cancel')}
             </Button>
           ) : null}
           {permissions.canManage ? (
@@ -465,23 +476,25 @@ function GiftCard({
                 }
                 onClick={onEdit}
               >
-                Modifier
+                {t('gift.edit')}
               </Button>
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="destructive" size="sm">
-                    Supprimer
+                    {t('gift.delete')}
                   </Button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Supprimer {gift.title}</DialogTitle>
+                    <DialogTitle>
+                      {t('gift.deleteTitle', { title: gift.title })}
+                    </DialogTitle>
                     <DialogDescription>
-                      Cette action supprimera définitivement cette idée.
+                      {t('gift.deleteDescription')}
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
-                    <Button variant="outline">Annuler</Button>
+                    <Button variant="outline">{t('gift.cancel')}</Button>
                     <Button
                       variant="destructive"
                       onClick={() =>
@@ -490,7 +503,7 @@ function GiftCard({
                         )
                       }
                     >
-                      Supprimer
+                      {t('gift.delete')}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -506,7 +519,7 @@ function GiftCard({
                 : 'text-sm text-primary-foreground/75'
             }
           >
-            Réservé par {gift.reservedBy.name}
+            {t('gift.reservedBy', { name: gift.reservedBy.name })}
           </p>
         ) : null}
         {gift.reservedByGuestName ? (
@@ -517,7 +530,7 @@ function GiftCard({
                 : 'text-sm text-primary-foreground/75'
             }
           >
-            Réservé par {gift.reservedByGuestName}
+            {t('gift.reservedBy', { name: gift.reservedByGuestName })}
           </p>
         ) : null}
       </CardContent>
@@ -529,13 +542,16 @@ function ProfileLinks({
   title,
   profiles,
   inverted = false,
-  listLabel = 'Voir la liste',
+  listLabel,
 }: {
   title: string
   profiles: ProfileSummary[]
   inverted?: boolean
   listLabel?: string
 }) {
+  const { t } = useI18n()
+  const resolvedListLabel = listLabel ?? t('profiles.viewList')
+
   return (
     <section className="flex flex-col gap-8">
       <div>
@@ -545,7 +561,7 @@ function ProfileLinks({
               {title}
             </h2>
             <p className="font-mono text-2xl font-bold leading-none text-primary-foreground">
-              Voir les listes
+              {t('profiles.viewLists')}
             </p>
           </>
         ) : (
@@ -558,7 +574,7 @@ function ProfileLinks({
             key={profile.id}
             profile={profile}
             list
-            listLabel={listLabel}
+            listLabel={resolvedListLabel}
           />
         ))}
       </div>

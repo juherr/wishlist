@@ -21,7 +21,7 @@ class ProfileController extends Controller
     public function index(Request $request): Response|RedirectResponse
     {
         if (! $request->session()->has('active_profile_id') && ! $request->session()->has('guest_name')) {
-            return to_route('home')->with('error', 'Choisis un profil ou continue en invité.');
+            return to_route('home')->with('error', __('messages.access.required'));
         }
 
         return Inertia::render('Profiles/Index', [
@@ -57,13 +57,13 @@ class ProfileController extends Controller
             $request->session()->put('active_profile_id', $profile->id);
         }
 
-        return to_route('profiles.show', $profile)->with('success', 'Profil créé.');
+        return to_route('profiles.show', $profile)->with('success', __('messages.profile.created'));
     }
 
     public function show(Request $request, Profile $profile): Response|RedirectResponse
     {
         if (! $request->session()->has('active_profile_id') && ! $request->session()->has('guest_name')) {
-            return to_route('home')->with('error', 'Choisis un profil ou continue en invité.');
+            return to_route('home')->with('error', __('messages.access.required'));
         }
 
         $children = $profile->children()->orderBy('name')->get();
@@ -117,7 +117,7 @@ class ProfileController extends Controller
         $profile->update($data);
         $profile->parents()->sync($data['is_child'] ? $parentIds : []);
 
-        return to_route('profiles.show', $profile)->with('success', 'Profil modifié.');
+        return to_route('profiles.show', $profile)->with('success', __('messages.profile.updated'));
     }
 
     public function destroy(Request $request, Profile $profile): RedirectResponse
@@ -131,7 +131,7 @@ class ProfileController extends Controller
             $request->session()->forget('active_profile_id');
         }
 
-        return to_route('home')->with('success', "Profil {$name} supprimé.");
+        return to_route('home')->with('success', __('messages.profile.deleted', ['name' => $name]));
     }
 
     private function parentOptions(?Profile $excluded = null)

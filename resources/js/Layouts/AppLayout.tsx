@@ -4,6 +4,7 @@ import { PropsWithChildren, useEffect } from 'react'
 import type React from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/Components/ui/button'
+import { useI18n } from '@/i18n'
 import { PageProps } from '@/types'
 
 type AppLayoutProps = PropsWithChildren<{
@@ -19,6 +20,7 @@ export function AppLayout({
   children,
 }: AppLayoutProps) {
   const { flash, session } = usePage<PageProps>().props
+  const { locale, t } = useI18n()
 
   useEffect(() => {
     if (flash.success) toast.success(flash.success)
@@ -56,10 +58,23 @@ export function AppLayout({
                 </span>
               ) : null}
               {actions}
+              <div className="flex rounded-full border-2 border-primary-foreground/50 p-1 text-sm">
+                {(['fr', 'en'] as const).map((candidate) => (
+                  <button
+                    key={candidate}
+                    type="button"
+                    className={`rounded-full px-3 py-1 ${locale === candidate ? 'bg-primary-foreground text-primary' : 'text-primary-foreground'}`}
+                    aria-pressed={locale === candidate}
+                    onClick={() => router.post(`/locale/${candidate}`)}
+                  >
+                    {t(`app.language.${candidate}`)}
+                  </button>
+                ))}
+              </div>
               <Button asChild variant="secondary" size="sm">
                 <Link href="/profiles/create">
                   <Plus data-icon="inline-start" />
-                  Profil
+                  {t('app.addProfile')}
                 </Link>
               </Button>
               {(session.activeProfile || session.guestName) && (
@@ -70,12 +85,27 @@ export function AppLayout({
                   onClick={() => router.delete('/session')}
                 >
                   <LogOut data-icon="inline-start" />
-                  Quitter
+                  {t('app.leave')}
                 </Button>
               )}
             </div>
           </div>
         </header>
+      ) : null}
+      {bare ? (
+        <div className="fixed right-4 top-4 z-40 flex rounded-full border-2 border-primary bg-background/90 p-1 text-sm shadow-[0_0_18px_rgba(32,40,89,0.12)] backdrop-blur">
+          {(['fr', 'en'] as const).map((candidate) => (
+            <button
+              key={candidate}
+              type="button"
+              className={`rounded-full px-3 py-1 ${locale === candidate ? 'bg-primary text-primary-foreground' : 'text-primary'}`}
+              aria-pressed={locale === candidate}
+              onClick={() => router.post(`/locale/${candidate}`)}
+            >
+              {t(`app.language.${candidate}`)}
+            </button>
+          ))}
+        </div>
       ) : null}
       <main
         className={`mx-auto flex max-w-[1300px] flex-col gap-8 px-4 py-8 sm:px-8 ${bare ? '' : 'pt-32'}`}

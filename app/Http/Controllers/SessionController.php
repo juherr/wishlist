@@ -24,7 +24,9 @@ class SessionController extends Controller
         $request->session()->forget('guest_name');
         $request->session()->put('active_profile_id', $profile->id);
 
-        return to_route('profiles.show', $profile)->with('success', "Profil {$profile->name} sélectionné.");
+        return to_route('profiles.show', $profile)->with('success', __('messages.session.profile_selected', [
+            'name' => $profile->name,
+        ]));
     }
 
     public function guest(Request $request): RedirectResponse
@@ -36,13 +38,13 @@ class SessionController extends Controller
         $request->session()->forget('active_profile_id');
         $request->session()->put('guest_name', $validated['guest_name']);
 
-        return to_route('profiles.index')->with('success', 'Accès invité activé.');
+        return to_route('profiles.index')->with('success', __('messages.session.guest_enabled'));
     }
 
     public function destroy(Request $request): RedirectResponse
     {
         $request->session()->forget(['active_profile_id', 'guest_name']);
 
-        return to_route('home')->with('success', 'Session fermée.');
+        return to_route('home')->with('success', __('messages.session.closed'));
     }
 }

@@ -24,3 +24,15 @@ it('formats age for children under two years in months', function (): void {
 
     Carbon::setTestNow();
 });
+
+it('formats age in the active locale', function (): void {
+    Carbon::setTestNow('2026-06-21');
+    app()->setLocale('en');
+
+    $profile = Profile::factory()->create(['birthday' => '2020-06-21']);
+
+    expect($profile->display_age)->toBe('6 years');
+
+    app()->setLocale('fr');
+    Carbon::setTestNow();
+});

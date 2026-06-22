@@ -27,6 +27,8 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'locale' => app()->getLocale(),
+            'supportedLocales' => ['fr', 'en'],
             'session' => [
                 'activeProfile' => fn () => $activeProfileId
                     ? Profile::query()->find($activeProfileId)?->only(['id', 'name', 'avatar'])
