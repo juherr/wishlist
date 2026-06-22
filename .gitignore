@@ -1,1 +1,17 @@
 **/vendor
+node_modules
+/.env
+/database/*.sqlite
+/database/seeders/production_snapshot.sql
+/public/build
+/storage/*.key
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+!/storage/framework/cache/.gitignore
+!/storage/framework/sessions/.gitignore
+!/storage/framework/testing/.gitignore
+!/storage/framework/views/.gitignore
+!/storage/logs/.gitignore
