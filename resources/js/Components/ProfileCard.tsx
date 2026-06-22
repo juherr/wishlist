@@ -20,6 +20,7 @@ export function ProfileCard({
 
   return (
     <Card
+      data-testid={`profile-card-${profile.name}`}
       className={
         compact
           ? 'flex items-center justify-start gap-5 p-4'

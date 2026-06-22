@@ -11,6 +11,8 @@
     "format": "prettier --write resources/js resources/css",
     "format:check": "prettier --check resources/js resources/css",
     "check": "npm run lint && npm run format:check && npm run build",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
     "audit:prod": "npm audit --omit=dev",
     "commitlint": "commitlint --edit"
   },
@@ -41,6 +43,8 @@
   "devDependencies": {
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
+    "@faker-js/faker": "^10.5.0",
+    "@playwright/test": "^1.61.0",
     "@types/node": "^24.5.2",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",

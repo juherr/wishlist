@@ -49,6 +49,10 @@ class GiftController extends Controller
     {
         abort_unless($gift->profile()->is($profile), 404);
 
+        if ($gift->is_list) {
+            return to_route('profiles.show', $profile)->with('error', 'Une liste externe ne peut pas être réservée.');
+        }
+
         if ($gift->is_reserved) {
             return to_route('profiles.show', $profile)->with('error', 'Ce cadeau est déjà réservé.');
         }

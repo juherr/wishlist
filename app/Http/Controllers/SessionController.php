@@ -19,6 +19,8 @@ class SessionController extends Controller
 
     public function profile(Request $request, Profile $profile): RedirectResponse
     {
+        abort_if($profile->is_child, 403);
+
         $request->session()->forget('guest_name');
         $request->session()->put('active_profile_id', $profile->id);
 

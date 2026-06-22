@@ -49,20 +49,64 @@ it('imports legacy data idempotently', function (): void {
         ['userID' => 1, 'name' => 'Parent', 'isChildAccount' => false, 'picture' => 1],
         ['userID' => 2, 'name' => 'Child', 'isChildAccount' => true, 'picture' => 2],
     ]);
-    $legacy->table('KDO_parents')->insert(['ID_parent' => 1, 'ID_child' => 2]);
+    $legacy->table('KDO_parents')->insert([
+        ['ID_parent' => 1, 'ID_child' => 2],
+        ['ID_parent' => 999, 'ID_child' => 2],
+        ['ID_parent' => 1, 'ID_child' => 999],
+    ]);
     $legacy->table('KDO_gifts')->insert([
-        'ID' => 10,
-        'userID' => 2,
-        'title' => 'Livre',
-        'isList' => false,
-        'isReserved' => false,
+        [
+            'ID' => 10,
+            'userID' => 2,
+            'title' => 'Book',
+            'description' => null,
+            'link' => null,
+            'isList' => false,
+            'isReserved' => false,
+            'reservationUserID' => null,
+            'reservationGuestName' => null,
+        ],
+        [
+            'ID' => 11,
+            'userID' => 2,
+            'title' => 'Reserved toy',
+            'description' => null,
+            'link' => null,
+            'isList' => false,
+            'isReserved' => true,
+            'reservationUserID' => 1,
+            'reservationGuestName' => null,
+        ],
+        [
+            'ID' => 12,
+            'userID' => 999,
+            'title' => 'Orphan gift',
+            'description' => null,
+            'link' => null,
+            'isList' => false,
+            'isReserved' => false,
+            'reservationUserID' => null,
+            'reservationGuestName' => null,
+        ],
     ]);
 
-    $this->artisan('wishlist:import-legacy')->assertSuccessful();
+    $this->artisan('wishlist:import-legacy')
+        ->expectsOutputToContain('Skipping legacy parent relation 999 -> 2: missing imported profile.')
+        ->expectsOutputToContain('Skipping legacy parent relation 1 -> 999: missing imported profile.')
+        ->expectsOutputToContain('Skipping legacy gift 12: missing owner profile 999.')
+        ->assertSuccessful();
     $this->artisan('wishlist:import-legacy')->assertSuccessful();
 
+    $parent = Profile::query()->where('legacy_id', 1)->firstOrFail();
+    $child = Profile::query()->where('legacy_id', 2)->firstOrFail();
+    $reservedGift = Gift::query()->where('legacy_id', 11)->firstOrFail();
+
     expect(Profile::query()->count())->toBe(2)
-        ->and(Gift::query()->count())->toBe(1);
+        ->and(Gift::query()->count())->toBe(2)
+        ->and($parent->children()->whereKey($child->id)->exists())->toBeTrue()
+        ->and($reservedGift->reserved_by_profile_id)->toBe($parent->id)
+        ->and($reservedGift->reserved_by_guest_name)->toBeNull()
+        ->and($reservedGift->reserved_at)->not->toBeNull();
 
     Schema::connection('legacy_mysql')->dropAllTables();
 });

@@ -18,8 +18,12 @@ class ProfileController extends Controller
 {
     use ResolvesProfiles;
 
-    public function index(): Response
+    public function index(Request $request): Response|RedirectResponse
     {
+        if (! $request->session()->has('active_profile_id') && ! $request->session()->has('guest_name')) {
+            return to_route('home')->with('error', 'Choisis un profil ou continue en invité.');
+        }
+
         return Inertia::render('Profiles/Index', [
             'profiles' => Profile::query()
                 ->withCount('children')
@@ -47,6 +51,11 @@ class ProfileController extends Controller
 
         $profile = Profile::query()->create($data);
         $profile->parents()->sync($data['is_child'] ? $parentIds : []);
+
+        if (! $profile->is_child) {
+            $request->session()->forget('guest_name');
+            $request->session()->put('active_profile_id', $profile->id);
+        }
 
         return to_route('profiles.show', $profile)->with('success', 'Profil créé.');
     }

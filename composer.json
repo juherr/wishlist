@@ -50,7 +50,7 @@
             "@php artisan test"
         ],
         "coverage": [
-            "vendor/bin/pest --coverage --min=50"
+            "vendor/bin/pest --coverage --min=100 --coverage-clover=coverage/clover.xml --coverage-html=coverage/html"
         ],
         "lint": [
             "vendor/bin/pint --test"

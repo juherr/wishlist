@@ -49,6 +49,8 @@ class ImportLegacyWishlist extends Command
                     $child = Profile::query()->where('legacy_id', $row->ID_child)->first();
 
                     if (! $parent || ! $child) {
+                        $this->warn("Skipping legacy parent relation {$row->ID_parent} -> {$row->ID_child}: missing imported profile.");
+
                         return;
                     }
 
@@ -67,6 +69,8 @@ class ImportLegacyWishlist extends Command
                     $profile = Profile::query()->where('legacy_id', $row->userID)->first();
 
                     if (! $profile) {
+                        $this->warn("Skipping legacy gift {$row->ID}: missing owner profile {$row->userID}.");
+
                         return;
                     }
 

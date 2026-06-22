@@ -365,6 +365,7 @@ function GiftCard({
 }) {
   return (
     <Card
+      data-testid={`gift-card-${gift.title}`}
       className={
         gift.isList
           ? 'border-2 border-primary bg-transparent text-primary shadow-none'
