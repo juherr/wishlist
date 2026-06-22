@@ -103,3 +103,6 @@ jobs:
 
       - name: Run E2E tests
         run: npm run e2e
+        env:
+          E2E_USE_BUILT_ASSETS: 'true'
+          E2E_USE_DOCKER: 'false'
